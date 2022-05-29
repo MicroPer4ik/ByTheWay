@@ -1,0 +1,53 @@
+﻿@page "/serviceview"
+@inject IServicesService ServicesService
+@inject NavigationManager NavigationManager
+
+<h3>ServiceView</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Наименование</th>
+            <th>Стоимость</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+            @foreach (var service in ServicesService.Services)
+            {
+                <tr>
+                    <td>@service.TitleService</td>
+                    <td>@service.CostService</td>
+                    <td>@service.DescriptionService</td>
+                    <td>
+                        <button class="btn btn-primary"
+                            @onclick="(() => ShowService(service.Id))">
+                            <i class="oi oi-pencil"></i>
+                    </button>
+                    </td>
+                </tr>
+                
+            }
+              
+    </tbody>
+</table>
+
+<button class="btn btn-primary" @onclick="CreateNewService">Создать новую услугу</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ServicesService.LoadService();
+    }
+
+    void ShowService(int id)
+    {
+        NavigationManager.NavigateTo($"service/{id}");
+    }
+
+    void CreateNewService()
+    {
+        NavigationManager.NavigateTo("service");
+    }
+}
