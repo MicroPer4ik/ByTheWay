@@ -16,7 +16,7 @@ namespace BlazorServer.Models.Services
             _context.Database.EnsureCreated();
         }
 
-        public List<Client> Clients { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public List<Client> Clients { get; set; } = new List<Client>();
 
         public async Task CreateClient(Client client)
         {
@@ -24,7 +24,7 @@ namespace BlazorServer.Models.Services
             {
                 _context.Clients.Add(client);
                 await _context.SaveChangesAsync();
-                _navigationManager.NavigateTo("clientlist");
+                _navigationManager.NavigateTo("clientslist");
             }
             catch (Exception ex)
             {
@@ -42,7 +42,7 @@ namespace BlazorServer.Models.Services
 
             _context.Clients.Remove(client);
             await _context.SaveChangesAsync();
-            _navigationManager.NavigateTo("clientlist");
+            _navigationManager.NavigateTo("clientslist");
         }
 
         public async Task<Client> GetSingleClient(int id)
@@ -76,7 +76,7 @@ namespace BlazorServer.Models.Services
             
 
             await _context.SaveChangesAsync();
-            _navigationManager.NavigateTo("clientlist");
+            _navigationManager.NavigateTo("clientslist");
         }
     }
 }

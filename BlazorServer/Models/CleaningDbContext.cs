@@ -81,6 +81,8 @@ namespace BlazorServer.Models
 
             modelBuilder.Entity<Client>(entity =>
             {
+                entity.Property(e => e.PhoneNumber).HasMaxLength(50);
+
                 entity.Property(e => e.Address).HasMaxLength(50);
 
                 entity.Property(e => e.Email).HasMaxLength(50);

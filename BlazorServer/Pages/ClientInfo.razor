@@ -1,0 +1,92 @@
+﻿@page "/clientinfo"
+@page "/clientinfo/{id:int}"
+
+@inject IClientService ClientService
+
+<div class="site-section" id="section-about">
+    <div class="container">
+        <div class="row mb-5">
+@if(Id==null)
+{
+    <h3>Создание новой клиента</h3>
+}
+else
+{
+    <h3>Изменение клиента: @client.Surname @client.Name @client.Patronymic</h3>
+}
+
+<EditForm Model="client" OnSubmit="HandleSubmit">
+    <div>
+        <label for="title">Фамилия</label>
+        <InputText id="title" @bind-Value="client.Surname" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="title">Имя</label>
+        <InputText id="title" @bind-Value="client.Name" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="title">Отчество</label>
+        <InputText id="title" @bind-Value="client.Patronymic" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="title">Почта</label>
+        <InputText id="title" @bind-Value="client.Email" class="form-control"></InputText>        
+    </div>
+    <div>
+        <label for="title">Телефон</label>
+        <InputText id="title" @bind-Value="client.PhoneNumber" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="title">Адрес</label>
+        <InputText id="title" @bind-Value="client.Address" class="form-control"></InputText>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    @if(Id != null)
+    {
+        <button type="button" class="btn btn-danger" @onclick="DeleteService">Удалить услугу</button>
+        
+    }
+        
+</EditForm>
+</div>
+</div>
+</div>
+@code {
+     [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    Client client = new Client();
+
+    protected override void OnInitialized()
+    {
+        btnText = Id == null ? "Сохранить новую клиента" : "Изменить услугу";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Id != null)
+        {
+            client = await ClientService.GetSingleClient((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if(Id== null)
+        {
+            await ClientService.CreateClient(client);
+        }
+        else
+        {
+            await ClientService.UpdateClient(client, (int)Id);
+        }
+    }
+
+    async Task DeleteService()
+    {
+        await ClientService.DeleteClient(client.Id);
+    }
+}

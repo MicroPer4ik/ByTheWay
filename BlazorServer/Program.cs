@@ -17,6 +17,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<CleaningDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IServicesService, ServicesService>();
+builder.Services.AddScoped<IClientService, ClientsService>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
 //    .AddEntityFrameworkStores<ApplicationDbContext>();

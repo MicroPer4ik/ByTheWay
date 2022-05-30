@@ -1,0 +1,59 @@
+﻿@page "/clientslist"
+@inject IClientService ClientService
+@inject NavigationManager NavigationManager
+
+<div class="site-section" id="section-about">
+    <div class="container">
+        <div class="row mb-5">
+    <h3 class=" font-weight-light font-weight-bold" data-aos="fade-up">Список клиентов</h3>
+
+<table data-aos="fade-up" class="table" style="background-color:white">
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Почта</th>
+            <th>Телефон</th>
+            <th>Адрес</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var client in ClientService.Clients)
+        {
+            <tr>
+                <td>@client.Surname @client.Name @client.Patronymic</td>
+                <td>@client.Email</td>
+                <td>@client.PhoneNumber</td>
+                <td>@client.Address</td>
+                <td><button class="btn btn-primary"
+                            @onclick="(() => ShowService(client.Id))">
+                            <i class="oi oi-pencil"></i>
+                    </button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-primary" @onclick="CreateNewClient">Добавить нового клиента</button>
+</div>
+</div>
+</div>
+
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientService.LoadClients();
+    }
+
+    void ShowService(int id)
+    {
+        NavigationManager.NavigateTo($"clientinfo/{id}");
+    }
+
+    void CreateNewClient()
+    {
+        NavigationManager.NavigateTo("clientinfo");
+    }
+
+}
