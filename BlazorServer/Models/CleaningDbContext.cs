@@ -23,6 +23,7 @@ namespace BlazorServer.Models
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Service> Services { get; set; } = null!;
+        public virtual DbSet<ServiceType> ServiceTypes { get; set; } = null!;
         public virtual DbSet<StatusBid> StatusBids { get; set; } = null!;
         public virtual DbSet<StatusEmployee> StatusEmployees { get; set; } = null!;
         public virtual DbSet<StatusOrder> StatusOrders { get; set; } = null!;
@@ -31,6 +32,7 @@ namespace BlazorServer.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer("Server=HOME-PC;Database=CleaningDb;Trusted_Connection=True;");
             }
         }
@@ -39,11 +41,17 @@ namespace BlazorServer.Models
         {
             modelBuilder.Entity<Bid>(entity =>
             {
-                entity.Property(e => e.DatePerfomance).HasColumnType("date");
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.DateSubmission).HasColumnType("date");
 
                 entity.Property(e => e.Description).HasMaxLength(500);
+
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p.Bid)
+                    .HasForeignKey<Bid>(d => d.Id)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Bids_Orders");
 
                 entity.HasOne(d => d.IdClientNavigation)
                     .WithMany(p => p.Bids)
@@ -51,17 +59,24 @@ namespace BlazorServer.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Bids_Clients");
 
-                entity.HasOne(d => d.IdServiceNavigation)
-                    .WithMany(p => p.Bids)
-                    .HasForeignKey(d => d.IdService)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Bids_Services");
-
                 entity.HasOne(d => d.IdStatusNavigation)
                     .WithMany(p => p.Bids)
                     .HasForeignKey(d => d.IdStatus)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Bids_StatusBid");
+
+                entity.HasMany(d => d.IdServices)
+                    .WithMany(p => p.IdBs)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "BidsService",
+                        l => l.HasOne<Service>().WithMany().HasForeignKey("IdService").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_BidsService_Services"),
+                        r => r.HasOne<Bid>().WithMany().HasForeignKey("IdBid").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_BidsService_Bids"),
+                        j =>
+                        {
+                            j.HasKey("IdBid", "IdService");
+
+                            j.ToTable("BidsService");
+                        });
             });
 
             modelBuilder.Entity<Blog>(entity =>
@@ -81,8 +96,6 @@ namespace BlazorServer.Models
 
             modelBuilder.Entity<Client>(entity =>
             {
-                entity.Property(e => e.PhoneNumber).HasMaxLength(50);
-
                 entity.Property(e => e.Address).HasMaxLength(50);
 
                 entity.Property(e => e.Email).HasMaxLength(50);
@@ -90,6 +103,8 @@ namespace BlazorServer.Models
                 entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.Property(e => e.Patronymic).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Surname).HasMaxLength(50);
             });
@@ -119,8 +134,6 @@ namespace BlazorServer.Models
 
                 entity.Property(e => e.DateEnd).HasColumnType("date");
 
-                entity.Property(e => e.IdClient).HasMaxLength(50);
-
                 entity.Property(e => e.PriceOrder).HasColumnType("decimal(18, 0)");
 
                 entity.HasOne(d => d.Employee)
@@ -128,12 +141,6 @@ namespace BlazorServer.Models
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Orders_Employees");
-
-                entity.HasOne(d => d.IdB)
-                    .WithMany(p => p.Orders)
-                    .HasForeignKey(d => d.IdBid)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Orders_Bids");
 
                 entity.HasOne(d => d.IdStatusNavigation)
                     .WithMany(p => p.Orders)
@@ -157,13 +164,20 @@ namespace BlazorServer.Models
 
             modelBuilder.Entity<Service>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
                 entity.Property(e => e.CostService).HasColumnType("decimal(18, 0)");
 
-                entity.Property(e => e.DescriptionService).HasMaxLength(200);
-
                 entity.Property(e => e.TitleService).HasMaxLength(50);
+
+                entity.HasOne(d => d.IdServiceTypeNavigation)
+                    .WithMany(p => p.Services)
+                    .HasForeignKey(d => d.IdServiceType)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Services_ServiceTypes");
+            });
+
+            modelBuilder.Entity<ServiceType>(entity =>
+            {
+                entity.Property(e => e.TypeTitle).HasMaxLength(50);
             });
 
             modelBuilder.Entity<StatusBid>(entity =>

@@ -1,4 +1,5 @@
-﻿namespace BlazorServer.Models.Interfaces
+﻿
+namespace BlazorServer.Models.Interfaces
 {
     public interface IClientService
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace BlazorServer.Models
 {
@@ -8,14 +7,16 @@ namespace BlazorServer.Models
     {
         public Service()
         {
-            Bids = new HashSet<Bid>();
+            IdBs = new HashSet<Bid>();
         }
-        [Key]
+
         public int Id { get; set; }
         public string TitleService { get; set; } = null!;
         public decimal CostService { get; set; }
-        public string DescriptionService { get; set; } = null!;
+        public int IdServiceType { get; set; }
 
-        public virtual ICollection<Bid> Bids { get; set; }
+        public virtual ServiceType IdServiceTypeNavigation { get; set; } = null!;
+
+        public virtual ICollection<Bid> IdBs { get; set; }
     }
 }

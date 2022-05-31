@@ -21,10 +21,6 @@ else
         <label for="cost">Стоимость</label>
         <InputNumber id="cost" @bind-Value="service.CostService" class="form-control"></InputNumber>
     </div>
-    <div>
-        <label for="description">Описание</label>
-        <InputText id="description" @bind-Value="service.DescriptionService" class="form-control"></InputText>
-    </div>
     <br/>
     <button type="submit" class="btn btn-primary">@btnText</button>
     @if(Id != null)

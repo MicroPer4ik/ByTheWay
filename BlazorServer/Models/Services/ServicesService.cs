@@ -27,7 +27,7 @@ namespace BlazorServer.Models.Services
                 await _context.SaveChangesAsync();
                 _navigationManager.NavigateTo("serviceview");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -49,7 +49,7 @@ namespace BlazorServer.Models.Services
         public async Task<Service> GetSingleService(int id)
         {
             var service = await _context.Services.FindAsync(id);
-            if(service == null)
+            if (service == null)
             {
                 throw new Exception("Нет сервиса. :/");
             }
@@ -64,13 +64,12 @@ namespace BlazorServer.Models.Services
         public async Task UpdateService(Service service, int id)
         {
             var dbService = await _context.Services.FindAsync(id);
-            if(dbService == null)
+            if (dbService == null)
             {
                 throw new Exception("Нет сервиса. :/");
             }
             dbService.TitleService = service.TitleService;
             dbService.CostService = service.CostService;
-            dbService.DescriptionService = service.DescriptionService;
 
             await _context.SaveChangesAsync();
             _navigationManager.NavigateTo("serviceview");

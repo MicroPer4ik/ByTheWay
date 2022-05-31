@@ -73,7 +73,7 @@ namespace BlazorServer.Models.Services
             dbClient.Address = client.Address;
             dbClient.PhoneNumber = client.PhoneNumber;
             dbClient.Email = client.Email;
-            
+
 
             await _context.SaveChangesAsync();
             _navigationManager.NavigateTo("clientslist");

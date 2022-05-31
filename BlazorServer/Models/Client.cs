@@ -16,7 +16,7 @@ namespace BlazorServer.Models
         public string Name { get; set; } = null!;
         public string Patronymic { get; set; } = null!;
         public string Email { get; set; } = null!;
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = null!;
         public string Address { get; set; } = null!;
 
         public virtual ICollection<Bid> Bids { get; set; }
