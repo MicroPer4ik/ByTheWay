@@ -7,7 +7,7 @@ namespace BlazorServer.Models
     {
         public Client()
         {
-            Bids = new HashSet<Bid>();
+            Orders = new HashSet<Order>();
             Reviews = new HashSet<Review>();
         }
 
@@ -19,7 +19,7 @@ namespace BlazorServer.Models
         public string PhoneNumber { get; set; } = null!;
         public string Address { get; set; } = null!;
 
-        public virtual ICollection<Bid> Bids { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
     }
 }

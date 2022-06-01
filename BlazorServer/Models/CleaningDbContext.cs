@@ -16,17 +16,15 @@ namespace BlazorServer.Models
         {
         }
 
-        public virtual DbSet<Bid> Bids { get; set; } = null!;
         public virtual DbSet<Blog> Blogs { get; set; } = null!;
         public virtual DbSet<Client> Clients { get; set; } = null!;
         public virtual DbSet<Employee> Employees { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
+        public virtual DbSet<OrderStatus> OrderStatuses { get; set; } = null!;
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Service> Services { get; set; } = null!;
         public virtual DbSet<ServiceType> ServiceTypes { get; set; } = null!;
-        public virtual DbSet<StatusBid> StatusBids { get; set; } = null!;
         public virtual DbSet<StatusEmployee> StatusEmployees { get; set; } = null!;
-        public virtual DbSet<StatusOrder> StatusOrders { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -39,46 +37,6 @@ namespace BlazorServer.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Bid>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
-                entity.Property(e => e.DateSubmission).HasColumnType("date");
-
-                entity.Property(e => e.Description).HasMaxLength(500);
-
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p.Bid)
-                    .HasForeignKey<Bid>(d => d.Id)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Bids_Orders");
-
-                entity.HasOne(d => d.IdClientNavigation)
-                    .WithMany(p => p.Bids)
-                    .HasForeignKey(d => d.IdClient)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Bids_Clients");
-
-                entity.HasOne(d => d.IdStatusNavigation)
-                    .WithMany(p => p.Bids)
-                    .HasForeignKey(d => d.IdStatus)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Bids_StatusBid");
-
-                entity.HasMany(d => d.IdServices)
-                    .WithMany(p => p.IdBs)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "BidsService",
-                        l => l.HasOne<Service>().WithMany().HasForeignKey("IdService").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_BidsService_Services"),
-                        r => r.HasOne<Bid>().WithMany().HasForeignKey("IdBid").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_BidsService_Bids"),
-                        j =>
-                        {
-                            j.HasKey("IdBid", "IdService");
-
-                            j.ToTable("BidsService");
-                        });
-            });
-
             modelBuilder.Entity<Blog>(entity =>
             {
                 entity.Property(e => e.Blog1)
@@ -134,19 +92,48 @@ namespace BlazorServer.Models
 
                 entity.Property(e => e.DateEnd).HasColumnType("date");
 
+                entity.Property(e => e.DateSubmission).HasColumnType("date");
+
+                entity.Property(e => e.Description).HasMaxLength(500);
+
                 entity.Property(e => e.PriceOrder).HasColumnType("decimal(18, 0)");
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.EmployeeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Orders_Employees");
+
+                entity.HasOne(d => d.IdClientNavigation)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.IdClient)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Orders_Clients");
 
                 entity.HasOne(d => d.IdStatusNavigation)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.IdStatus)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Orders_StatusOrder");
+                    .HasConstraintName("FK_Orders_OrderStatus");
+
+                entity.HasMany(d => d.IdServices)
+                    .WithMany(p => p.IdOrders)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "OrderService",
+                        l => l.HasOne<Service>().WithMany().HasForeignKey("IdService").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_OrderService_Services"),
+                        r => r.HasOne<Order>().WithMany().HasForeignKey("IdOrder").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_OrderService_Orders"),
+                        j =>
+                        {
+                            j.HasKey("IdOrder", "IdService");
+
+                            j.ToTable("OrderService");
+                        });
+            });
+
+            modelBuilder.Entity<OrderStatus>(entity =>
+            {
+                entity.ToTable("OrderStatus");
+
+                entity.Property(e => e.StatusName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Review>(entity =>
@@ -180,23 +167,9 @@ namespace BlazorServer.Models
                 entity.Property(e => e.TypeTitle).HasMaxLength(50);
             });
 
-            modelBuilder.Entity<StatusBid>(entity =>
-            {
-                entity.ToTable("StatusBid");
-
-                entity.Property(e => e.Status).HasMaxLength(50);
-            });
-
             modelBuilder.Entity<StatusEmployee>(entity =>
             {
                 entity.Property(e => e.RoleName).HasMaxLength(50);
-            });
-
-            modelBuilder.Entity<StatusOrder>(entity =>
-            {
-                entity.ToTable("StatusOrder");
-
-                entity.Property(e => e.Status).HasMaxLength(50);
             });
 
             OnModelCreatingPartial(modelBuilder);

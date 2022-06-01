@@ -13,7 +13,7 @@ namespace BlazorServer.Models.Services
         {
             _context = context;
             _navigationManager = navigationManager;
-            _context.Database.EnsureCreated();
+           // _context.Database.EnsureCreated();
         }
 
         public List<Service> Services { get; set; } = new List<Service>();
@@ -58,7 +58,7 @@ namespace BlazorServer.Models.Services
 
         public async Task LoadService()
         {
-            Services = await _context.Services.ToListAsync();
+            Services = await _context.Services.Include(s=>s.IdServiceTypeNavigation).ToListAsync();
         }
 
         public async Task UpdateService(Service service, int id)

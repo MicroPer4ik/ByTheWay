@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace BlazorServer.Models
 {
-    public partial class StatusOrder
+    public partial class OrderStatus
     {
-        public StatusOrder()
+        public OrderStatus()
         {
             Orders = new HashSet<Order>();
         }
 
         public int Id { get; set; }
-        public string Status { get; set; } = null!;
+        public string StatusName { get; set; } = null!;
 
         public virtual ICollection<Order> Orders { get; set; }
     }

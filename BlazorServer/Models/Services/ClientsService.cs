@@ -13,7 +13,8 @@ namespace BlazorServer.Models.Services
         {
             _context = context;
             _navigationManager = navigationManager;
-            _context.Database.EnsureCreated();
+            
+            //_context.Database.EnsureCreated();
         }
 
         public List<Client> Clients { get; set; } = new List<Client>();
@@ -57,7 +58,7 @@ namespace BlazorServer.Models.Services
 
         public async Task LoadClients()
         {
-            Clients = await _context.Clients.ToListAsync();
+            Clients = await _context.Clients.Include(c=>c.Reviews).ToListAsync();
         }
 
         public async Task UpdateClient(Client client, int id)

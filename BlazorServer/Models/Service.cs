@@ -7,7 +7,7 @@ namespace BlazorServer.Models
     {
         public Service()
         {
-            IdBs = new HashSet<Bid>();
+            IdOrders = new HashSet<Order>();
         }
 
         public int Id { get; set; }
@@ -17,6 +17,6 @@ namespace BlazorServer.Models
 
         public virtual ServiceType IdServiceTypeNavigation { get; set; } = null!;
 
-        public virtual ICollection<Bid> IdBs { get; set; }
+        public virtual ICollection<Order> IdOrders { get; set; }
     }
 }
