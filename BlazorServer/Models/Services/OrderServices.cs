@@ -4,18 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlazorServer.Models.Services
 {
-    public class OrderService : IOrdersService
+    public class OrderServices : IOrdersService
     {
         private readonly CleaningDbContext _context;
         private readonly NavigationManager _navigationManager;
-        public OrderService(CleaningDbContext cleaningDbContext, NavigationManager navigationManager )
+        public OrderServices(CleaningDbContext cleaningDbContext, NavigationManager navigationManager )
         {
             _context = cleaningDbContext; 
             _navigationManager = navigationManager;
             //_context.Database.EnsureCreated();
         }
 
-        public List<Order> Orders {get; set;}   
+        public List<Order> Orders { get; set; } = new List<Order>(); 
 
         public async Task CreateOrder(Order order, Client client)
         {
@@ -71,8 +71,8 @@ namespace BlazorServer.Models.Services
         }
 
         public async Task LoadOrders()
-        {
-            Orders = await _context.Orders.Include(o=>o.IdStatusNavigation).ToListAsync();
+        {         
+            Orders = await _context.Orders.Include(o=>o.IdStatusNavigation).Include(o=>o.Employee).ToListAsync();            
         }
 
         public async Task UpdateOrder(Order order, int id)

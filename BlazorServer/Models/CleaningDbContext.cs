@@ -20,6 +20,7 @@ namespace BlazorServer.Models
         public virtual DbSet<Client> Clients { get; set; } = null!;
         public virtual DbSet<Employee> Employees { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
+        public virtual DbSet<OrderService> OrderServices { get; set; } = null!;
         public virtual DbSet<OrderStatus> OrderStatuses { get; set; } = null!;
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Service> Services { get; set; } = null!;
@@ -30,7 +31,6 @@ namespace BlazorServer.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer("Server=HOME-PC;Database=CleaningDb;Trusted_Connection=True;");
             }
         }
@@ -114,19 +114,25 @@ namespace BlazorServer.Models
                     .HasForeignKey(d => d.IdStatus)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Orders_OrderStatus");
+            });
 
-                entity.HasMany(d => d.IdServices)
-                    .WithMany(p => p.IdOrders)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "OrderService",
-                        l => l.HasOne<Service>().WithMany().HasForeignKey("IdService").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_OrderService_Services"),
-                        r => r.HasOne<Order>().WithMany().HasForeignKey("IdOrder").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_OrderService_Orders"),
-                        j =>
-                        {
-                            j.HasKey("IdOrder", "IdService");
+            modelBuilder.Entity<OrderService>(entity =>
+            {
+                entity.HasKey(e => new { e.IdOrder, e.IdService });
 
-                            j.ToTable("OrderService");
-                        });
+                entity.ToTable("OrderService");
+
+                entity.HasOne(d => d.IdOrderNavigation)
+                    .WithMany(p => p.OrderServices)
+                    .HasForeignKey(d => d.IdOrder)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrderService_Orders");
+
+                entity.HasOne(d => d.IdServiceNavigation)
+                    .WithMany(p => p.OrderServices)
+                    .HasForeignKey(d => d.IdService)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrderService_Services");
             });
 
             modelBuilder.Entity<OrderStatus>(entity =>

@@ -18,7 +18,7 @@ builder.Services.AddDbContext<CleaningDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IServicesService, ServicesService>();
 builder.Services.AddScoped<IClientService, ClientsService>();
-builder.Services.AddScoped<IOrdersService, OrderService>();
+builder.Services.AddScoped<IOrdersService, OrderServices>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
 //    .AddEntityFrameworkStores<ApplicationDbContext>();

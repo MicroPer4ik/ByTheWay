@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorServer.Models
 {
     public partial class Order
     {
+
         public Order()
         {
-            IdServices = new HashSet<Service>();
+            OrderServices = new HashSet<OrderService>();
         }
 
         public int Id { get; set; }
@@ -24,6 +26,11 @@ namespace BlazorServer.Models
         public virtual Client IdClientNavigation { get; set; } = null!;
         public virtual OrderStatus IdStatusNavigation { get; set; } = null!;
 
-        public virtual ICollection<Service> IdServices { get; set; }
+        public virtual ICollection<OrderService> OrderServices { get; set; }
+        [NotMapped]
+        public int ServiceId { get; set; }
+
+        [NotMapped]
+        public List<Service> ServiceList { get; set; } = new List<Service>();
     }
 }

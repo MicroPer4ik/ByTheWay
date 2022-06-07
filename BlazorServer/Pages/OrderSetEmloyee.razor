@@ -1,0 +1,193 @@
+﻿@page "/ordersetemployee/{id:int}"
+@using Microsoft.EntityFrameworkCore
+@inject NavigationManager NavigaionManager
+@inject IJSRuntime JSRuntime
+
+<div class="site-section" id="section-about">
+    <div class="container">
+        <div class="mb-5">
+            <h3 class=" font-weight-light font-weight-bold" data-aos="fade-up">Назначение исполнителя</h3>
+            <EditForm Model="@order" OnSubmit="HandleSubmit">
+                <div>
+                    <label>@order.Id</label>
+                </div>
+                <div>
+                    <p>
+                       @* Клиент: @order.IdClientNavigation.Surname @order.IdClientNavigation.Name @order.IdClientNavigation.Patronymic <br />
+                        Адрес: @order.IdClientNavigation.Address <br />
+                        Телефон: @order.IdClientNavigation.PhoneNumber*@
+
+                    </p>
+                </div>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    Услуги
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (OrderServices.Count > 0)
+                            {
+                                @foreach (var service in OrderServices)
+                                {
+                                    <tr>
+                                        <td><span>@service.IdServiceNavigation.TitleService <InputNumber @bind-Value="service.Count"></InputNumber></span></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>Нет выбранных услуг</td>
+                                </tr>
+                            }
+
+
+                        </tbody>
+                    </table>
+                    
+                        <button class="btn btn-primary">Добавить услуги</button>
+                        <InputSelect class="form-control" Value="@order.ServiceId"
+                          ValueChanged="@((int id) => testSelect(id))" ValueExpression="@(() => order.ServiceId)">
+                            <option value="0" >Выберете услугу</option>
+                            @foreach (var serviceArr in services)
+                        {
+                            <option value="@serviceArr.Id">@serviceArr.TitleService</option>
+                        }
+                        </InputSelect>
+                    
+                </div>
+                <div>
+                    <label>Описание</label>
+                    <textarea readonly class="form-control">@order.Description</textarea>
+                </div>
+                <div>
+                    <label>Выберете дату работ</label>
+                    <InputDate @bind-Value="order.DateBeginning" class="form-control"></InputDate>
+                </div>
+                <div>
+                    <label>Выберете исполнителя</label>
+                    <InputSelect class="form-control" @bind-Value="order.EmployeeId" >
+                        <option value="0" selected>Выберете сострудника</option>
+                        @foreach (var item in employees)
+                        {
+                            <option value="@item.Id">@item.Surname</option>
+                        }
+                    </InputSelect>
+                </div>
+                <button class="btn btn-primary" @onclick="SaveChange">Сохранить</button>
+                <button class="btn btn-danger" @onclick="GoBack">Отмена</button>
+                <div><label>Айди сервиса: @order.ServiceId</label></div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    Order order = new Order();
+    List<OrderService> OrderServices = new List<OrderService>();
+    List<Service> services = new List<Service>();
+    Service service = new Service();
+    OrderService orderService = new OrderService();
+    List<Employee> employees = new List<Employee>();
+    CleaningDbContext context = new CleaningDbContext();
+    void testSelect(int id)
+    {
+        OrderService orderservice = new OrderService() { IdOrder = (int)Id, IdServiceNavigation = services.First(s=>s.Id==id), IdService = id };
+
+
+        if (!OrderServices.Any(o=>o.IdService == id))
+        {
+            order.ServiceList.Add(services.First(e => e.Id == id));
+            OrderServices.Add(orderservice);
+        }
+    }
+    void EmployeeHasChanged(int value)
+    {
+
+    }
+    async void SaveChange()
+    {
+        if (order.DateBeginning == null && order.EmployeeId == 0)
+        {
+            await Alert("Выберете дату начала работ и назначте сотрудника!");
+        }
+        else if (order.DateBeginning == null && order.EmployeeId != 0)
+        {
+            await Alert("Выберете дату начала работ!");
+        }
+        else if (order.DateBeginning != null && order.EmployeeId == 0)
+        {
+            await Alert("Назначьте сотудника!");
+        }
+        else if (order.DateBeginning != null && order.EmployeeId != 0)
+        {
+            GoBack(); 
+        }
+
+    }
+    void GoBack()
+    {
+        NavigaionManager.NavigateTo("ordersview");
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+        {
+            OrderServices = await context.OrderServices.Include(o => o.IdServiceNavigation).Where(o=>o.IdOrder == Id).ToListAsync();
+            employees = await context.Employees.Include(e => e.IdStatusNavigation).ToListAsync();
+            services = await context.Services.ToListAsync();
+            order = await context.Orders.Include(o => o.IdClientNavigation).FirstAsync(o => o.Id == Id);
+            orderService.IdOrder = (int)Id;
+            order.ServiceList = await context.Services.Include(s => s.OrderServices).Where(s => s.OrderServices.Any(c => c.IdOrder == order.Id)).ToListAsync();
+            //orderService = await context.OrderServices.Include(os=>os.IdOrderNavigation).Include(os => os.IdServiceNavigation).FirstAsync(os => os.IdOrder == Id);
+        }
+    }
+    void SetService(int id)
+    {
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        //order = await context.Orders.Include(o => o.IdClientNavigation).FirstAsync(o => o.Id == Id);
+        //if (Id != null)
+        //{
+        //    order = await context.Orders.Include(o => o.IdClientNavigation).FirstAsync(o => o.Id == Id);
+        //    employees = await context.Employees.Include(e => e.IdStatusNavigation).ToListAsync();
+        //    order.ServiceList = await context.Services.Include(s => s.OrderServices).Where(s => s.OrderServices.Any(c => c.IdOrder == order.Id)).ToListAsync();
+        //    //orderService = await context.OrderServices.Include(os=>os.IdOrderNavigation).Include(os => os.IdServiceNavigation).FirstAsync(os => os.IdOrder == Id);
+        //}
+    }
+    async Task HandleSubmit()
+    {
+
+        if(order.DateBeginning != null && order.EmployeeId != null)
+        {
+            foreach (var item in OrderServices)
+            {
+                if(!await context.OrderServices.ContainsAsync(item))
+                {
+                    await context.OrderServices.AddAsync(item);
+                    order.PriceOrder += (item.IdServiceNavigation.CostService*(decimal)item.Count);
+                }
+                
+            }
+            order.IdStatus = 2;
+            await context.SaveChangesAsync();
+        }
+
+    }
+
+    private async Task Alert(string Message)
+    {
+        await JSRuntime.InvokeAsync<object>("Alert", Message);
+    }
+}

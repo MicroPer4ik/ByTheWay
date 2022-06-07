@@ -1,5 +1,6 @@
 ﻿@page "/clientinfo"
 @page "/clientinfo/{id:int}"
+@using Microsoft.EntityFrameworkCore
 
 @inject IClientService ClientService
 
@@ -51,15 +52,62 @@
             </Confirmation>
 
         </EditForm>
+
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Номер</th>
+                        <th scope="col">Дата заказа</th>
+                        <th scope="col">Стоимость</th>
+                        <th scope="col">Услуги</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Orders)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.DateSubmission.ToShortDateString()</td>
+                            <td>@item.PriceOrder руб.</td>
+                            <td>
+                                @if (item.ServiceList.Count > 0)
+                                    {
+
+                                        <ul>
+                                            @foreach (var service in item.ServiceList)
+                                            {
+                                                <li>@service.TitleService</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span>Нет услуг</span>
+                                    }
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>Итого:</td>
+                        <td></td>
+                        <td>@AllPrice руб.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>
 @code {
     [Parameter]
     public int? Id { get; set; }
-
+    public decimal AllPrice {get;set;} = 0;
     string btnText = string.Empty;
-
-    Confirmation conformation; 
+    CleaningDbContext context = new CleaningDbContext();
+    List<Order> Orders = new List<Order>();
+    Confirmation conformation;
+    Client client = new Client();
 
     void DeleteBtnClick()
     {
@@ -77,7 +125,7 @@
         conformation.DisplayConformation();
     }
 
-    Client client = new Client();
+
 
     protected override void OnInitialized()
     {
@@ -89,6 +137,12 @@
         if (Id != null)
         {
             client = await ClientService.GetSingleClient((int)Id);
+            Orders = await context.Orders.Where(o => o.IdClient == Id).ToListAsync();
+            foreach (var order in Orders)
+            {
+                order.ServiceList = await context.Services.Include(s => s.OrderServices).Where(s => s.OrderServices.Any(c => c.IdOrder == order.Id)).ToListAsync();
+                AllPrice += order.PriceOrder;
+            }
         }
     }
 

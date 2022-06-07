@@ -12,9 +12,8 @@ namespace BlazorServer.Models.Services
         public ClientsService(CleaningDbContext context, NavigationManager navigationManager)
         {
             _context = context;
-            _navigationManager = navigationManager;
-            
-            //_context.Database.EnsureCreated();
+            _navigationManager = navigationManager;            
+            _context.Database.EnsureCreated();
         }
 
         public List<Client> Clients { get; set; } = new List<Client>();

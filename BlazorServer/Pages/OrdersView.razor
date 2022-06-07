@@ -1,0 +1,225 @@
+﻿@page "/ordersview"
+@using Microsoft.EntityFrameworkCore
+@inject IOrdersService OrdersService
+@inject NavigationManager NavigationManager
+
+<div class="site-section" id="section-about">
+    <div class="container">
+        <div class="row mb-5">
+            <div>
+                <h3 class=" font-weight-light font-weight-bold" data-aos="fade-up">Список заявок</h3>
+
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <select class="form-control" @onchange="SelectedStatusChanged">
+                        <option value="">Выберете статус</option>
+                        @foreach (var item in orderStatuses)
+                        {
+                            <option value="@item.StatusName">@item.StatusName</option>
+                        }
+                    </select>
+                    </div>
+                    <div class="col">
+
+                    </div>
+                    <div class="col">
+
+                    </div>
+                </div>
+            </div>
+           
+            <div>
+                <table data-aos="fade-up" class="table" style="background-color:white">
+                    <thead>
+                        <tr>
+                            <th>Номер заявки</th>
+                            <th>Дата создания</th>
+                            <th>Дата начала работ</th>
+                            <th>Дата окончания</th>
+                            <th>Исполнитель</th>
+                            <th>Описание</th>
+                            <th>Услуги</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Orders)
+                        {
+                            <tr>
+                                <td>@order.Id</td>
+                                <td>@order.DateSubmission.ToShortDateString()</td>
+                                @if (order.DateBeginning != null)
+                                {
+                                    <td>@order.DateBeginning.Value.ToShortDateString()</td>
+                                }
+                                else
+                                {
+                                    <td>Не назначено</td>
+                                }
+                                @if (order.DateEnd != null)
+                                {
+                                    <td>@order.DateEnd.Value.ToShortDateString()</td>
+                                }
+                                else
+                                {
+                                    <td>Работы не закончены</td>
+                                }
+
+
+                                @if (order.Employee != null)
+                                {
+                                    <td>@order.Employee.Surname</td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        Нет исполнителя
+                                        @* <button type="button" class="btn btn-primary"  @onclick="ChangeEmployee">Назначить исполнителя</button>
+                                <EmployeeChoice @ref="employeeChoice" onCancel="ChangeEmployee" onConfirm="OnConfirm" order="order" Employees="Employees">
+                                </EmployeeChoice>*@
+                                    </td>
+                                }
+                                <td><textarea readonly>@order.Description</textarea></td>
+                                <td>
+                                    @if (order.ServiceList.Count > 0)
+                                    {
+
+                                        <ul>
+                                            @foreach (var service in order.ServiceList)
+                                            {
+                                                <li>@service.TitleService</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span>Нет услуг</span>
+                                    }
+
+                                </td>
+                                <td>@order.IdStatusNavigation.StatusName</td>
+
+
+
+                                <td>
+                                    @if (order.IdStatus == 1)
+                                    {
+                                        <button class="btn btn-primary"
+                                        @onclick="(() => ShowOrder(order.Id))">
+                                            Назначить
+                                        </button>
+                                    }
+
+                                </td>
+
+
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <button class="btn btn-primary">Назад</button>
+                <button class="btn btn-primary">Вперед</button>
+            </div>
+            @*<InputSelect Value="@_order.IdStatus"
+            ValueChanged="@((int id) => testSelect(id))" ValueExpression="@(() => _order.IdStatus)">
+            @foreach (var item in orderStatuses)
+            {
+            <option value="@item.Id">@item.StatusName</option>
+            }
+            </InputSelect>*@
+
+            <p>@StatusName</p>
+
+            @*<InputSelect Value="orderStatus.StatusName" ValueChanged="@((string name) => setFilter(name))" ValueExpression="@(() => orderStatus.StatusName)">
+            @foreach (var item in orderStatuses)
+            {
+            <option value="@item.StatusName">@item.StatusName</option>
+            }
+            </InputSelect>*@
+            @*<button class="btn btn-primary" @onclick="DeleteLast">Удалить последнее</button>*@
+        </div>
+    </div>
+</div>
+
+
+@code {
+    int Id { get; set; }
+    EmployeeChoice employeeChoice;
+    Order _order = new Order();
+    OrderStatus orderStatus = new OrderStatus();
+    List<Order> tempOrders = new List<Order>();
+    int StatusId { get; set; } = 1;
+    string StatusName { get; set; } = "";
+    List<OrderStatus> orderStatuses = new List<OrderStatus>();
+    List<OrderService> OrderServices = new List<OrderService>();
+    List<Order> Orders = new List<Order>();
+    public List<Employee> Employees { get; set; }
+    CleaningDbContext context = new CleaningDbContext();
+    public Employee SelectedEmploee { get; set; }
+    void testSelect(int id)
+    {
+        //Orders =  tempOrders.Where(o => o.IdStatus == id).ToList();
+    }
+    void SelectedStatusChanged(ChangeEventArgs e)
+    {
+        if (!string.IsNullOrEmpty((string)e.Value))
+        {
+            StatusName = (string)e.Value;
+            Orders = tempOrders.Where(o => o.IdStatusNavigation.StatusName == StatusName).ToList();
+        }
+    }
+    void setFilter(ChangeEventArgs e)
+    {
+        Orders = tempOrders.Where(o => o.IdStatus == StatusId).ToList();
+    }
+    void ChangeEmployee()
+    {
+        employeeChoice.DisplayConformation();
+    }
+    void ShowOrder(int id)
+    {
+        NavigationManager.NavigateTo($"ordersetemployee/{id}");
+    }
+    void DeleteLast()
+    {
+        CleaningDbContext context = new CleaningDbContext();
+        int index = OrdersService.Orders.Count - 1;
+        OrdersService.Orders[index].IdStatusNavigation = context.OrderStatuses.First(o => o.Id == 2);
+    }
+    async void OnConfirm()
+    {
+
+    }
+
+    async Task<List<Service>> TakeService(int id)
+    {
+        return await context.Services.Include(s => s.OrderServices).Where(s => s.OrderServices.Any(c => c.IdOrder == id)).ToListAsync();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        tempOrders = await context.Orders.Include(o => o.IdClientNavigation).Include(o => o.IdStatusNavigation).ToListAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // await OrdersService.LoadOrders();
+        tempOrders = await context.Orders.Include(o => o.IdClientNavigation).Include(o => o.IdStatusNavigation).ToListAsync();
+        Orders = tempOrders.ToList();
+        OrderServices = await context.OrderServices.Include(o => o.IdServiceNavigation).Include(o => o.IdOrderNavigation).ToListAsync();
+        orderStatuses = await context.OrderStatuses.ToListAsync();
+        foreach (var order in Orders)
+        {
+            order.ServiceList = await TakeService(order.Id);
+        }
+
+        Employees = await context.Employees.ToListAsync();
+
+        List<Service> services = context.Services.Include(s => s.OrderServices).Where(s => s.OrderServices.Any(c => c.IdOrder == 1)).ToList();
+    }
+}

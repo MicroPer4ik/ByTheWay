@@ -1,11 +1,15 @@
 ﻿@page "/"
+@page "/index.html"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components
 @inject IClientService ClientService
 @inject IOrdersService OrderService
 @inject IServicesService ServicesService
+@inject IJSRuntime JSRuntime
 
-<PageTitle>Index</PageTitle>
+
+
+<PageTitle>Главная</PageTitle>
 
 <div class="site-blocks-cover overlay" style="background-image: url(images/hero_bg_2.jpg);" data-aos="fade" data-stellar-background-ratio="0.5" id="section-home">
     <div class="container">
@@ -16,7 +20,6 @@
 
                 <h1 class="text-white font-weight-light text-uppercase font-weight-bold" data-aos="fade-up">Мы делаем чисто</h1>
                 <p class="mb-5" data-aos="fade-up" data-aos-delay="100">Клининговая компания AquaChem</p>
-                <!-- <p data-aos="fade-up" data-aos-delay="200"><a href="https://free-template.co" class="btn btn-primary py-3 px-5 text-white">Get Started!</a></p>-->
 
             </div>
         </div>
@@ -165,87 +168,25 @@
     <div class="container">
         <div class="row justify-content-center mb-5" data-aos="fade-up">
             <div class="col-md-7 text-center border-primary">
-                <h2 class="mb-0 text-primary">Наши услуги</h2>
-                <p class="color-black-opacity-5">Lorem ipsum dolor sit amet.</p>
+                <h2 class="mb-0 text-primary">Наши услуги</h2>               
             </div>
         </div>
         <div class="row align-items-stretch">
             @foreach (var item in ServicesService.Services)
             {
                 <div class="col-md-6 col-lg-4 mb-4 mb-lg-4" data-aos="fade-up">
-                <div class="unit-4 d-flex">
-                    <div class="unit-4-icon mr-4"><span class="text-primary flaticon-plane"></span></div>
-                    <div>
-                        <h3>@item.TitleService</h3>
-                        <p>Стоимость: @item.CostService руб. за метр квадратный</p>                        
+                    <div class="unit-4 d-flex">
+                        <div class="unit-4-icon mr-4"><span class="text-primary flaticon-plane"></span></div>
+                        <div>
+                            <h3>@item.TitleService</h3>
+                            <p>Стоимость: @item.CostService руб. за метр квадратный</p>                            
+                            <input type="number" class="inp_val">
+                        </div>
                     </div>
                 </div>
-            </div>
-            }
-            @*<div class="col-md-6 col-lg-4 mb-4 mb-lg-4" data-aos="fade-up">
-                <div class="unit-4 d-flex">
-                    <div class="unit-4-icon mr-4"><span class="text-primary flaticon-plane"></span></div>
-                    <div>
-                        <h3>Air Freight</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis quis molestiae vitae eligendi at.</p>
-                        <p><a href="#">Learn More</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4 mb-lg-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="unit-4 d-flex">
-                    <div class="unit-4-icon mr-4"><span class="text-primary flaticon-boat-ship"></span></div>
-                    <div>
-                        <h3>Ocean Freight</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis quis molestiae vitae eligendi at.</p>
-                        <p><a href="#">Learn More</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4 mb-lg-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="unit-4 d-flex">
-                    <div class="unit-4-icon mr-4"><span class="text-primary flaticon-truck"></span></div>
-                    <div>
-                        <h3>Land Transportation</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis quis molestiae vitae eligendi at.</p>
-                        <p><a href="#">Learn More</a></p>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-md-6 col-lg-4 mb-4 mb-lg-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="unit-4 d-flex">
-                    <div class="unit-4-icon mr-4"><span class="text-primary flaticon-warehouse"></span></div>
-                    <div>
-                        <h3>Warehousing</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis quis molestiae vitae eligendi at.</p>
-                        <p><a href="#">Learn More</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4 mb-lg-4" data-aos="fade-up" data-aos-delay="400">
-                <div class="unit-4 d-flex">
-                    <div class="unit-4-icon mr-4"><span class="text-primary flaticon-wooden"></span></div>
-                    <div>
-                        <h3>Storage</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis quis molestiae vitae eligendi at.</p>
-                        <p><a href="#">Learn More</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4 mb-lg-4" data-aos="fade-up" data-aos-delay="500">
-                <div class="unit-4 d-flex">
-                    <div class="unit-4-icon mr-4"><span class="text-primary flaticon-worldwide"></span></div>
-                    <div>
-                        <h3>Worldwide Delivery</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis quis molestiae vitae eligendi at.</p>
-                        <p><a href="#">Learn More</a></p>
-                    </div>
-                </div>
-            </div>*@
-
+            }           
         </div>
+        <button class="btn btn-primary" @onclick="TestValue">Проверка</button>
     </div>
 </div>
 
@@ -380,149 +321,97 @@
                 <p class="color-black-opacity-5">Смотрите наши ежедневные новости и обновления</p>
             </div>
         </div>
-        
-            <div class="col-md-7 mb-5">
 
-                <EditForm Model="client" OnSubmit="HandleSubmit">
-                    <div class="row form-group">                        
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label class="text-black" for="lname">Фамилия</label>
-                            <InputText id="lname" class="form-control" @bind-Value="client.Surname"></InputText>
-                        </div>
-                        <div class="col-md-6" >
-                            <label class="text-black" for="fname">Имя</label>
-                            <InputText id="fname" class="form-control" @bind-Value="client.Name" ></InputText>
-                        </div>                        
+        <div class="col-md-7 mb-5">
+
+            <EditForm Model="client" OnSubmit="HandleSubmit">
+                <div class="row form-group">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="text-black" for="lname">Фамилия</label>
+                        <InputText id="lname" class="form-control" @bind-Value="client.Surname"></InputText>
                     </div>
-
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <label class="text-black" for="email">patronymic</label>
-                            <InputText id="patronymic" class="form-control" @bind-Value="client.Patronymic"></InputText>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="text-black" for="fname">Имя</label>
+                        <InputText id="fname" class="form-control" @bind-Value="client.Name"></InputText>
                     </div>
-
-                    <div class="row form-group">
-
-                        <div class="col-md-12">
-                            <label class="text-black" for="email">Email</label>
-                            <InputText id="email" class="form-control" @bind-Value="client.Email"></InputText>
-                        </div>
-                    </div>
-
-                    <div class="row form-group">
-
-                       <div class="col-md-12">
-                            <label class="text-black" for="phone">Телефон</label>
-                            <InputText id="phone" class="form-control" @bind-Value="client.PhoneNumber"></InputText>
-                        </div>
-                    </div>
-                    <div class="row form-group">
-
-                       <div class="col-md-12">
-                            <label class="text-black" for="address">Адрес</label>
-                            <InputText id="address" class="form-control" @bind-Value="client.Address"></InputText>
-                        </div>
-                    </div>
-
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <label class="text-black" for="description">Сообщение</label>
-                            <InputTextArea  id="description" cols="30" @bind-Value="order.Description"  rows="7" class="form-control"></InputTextArea>
-                        </div>
-                    </div>
-
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary py-2 px-4 text-white">Отправить</button>                            
-                        </div>
-                    </div>
-
-
-                </EditForm>
-
-
-                @*<form action="#" class="p-5 bg-white">
-
-
-                    <div class="row form-group">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label class="text-black" for="fname">Имя</label>
-                            <input type="text" id="fname" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-black" for="lname">Фамилия</label>
-                            <input type="text" id="lname" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row form-group">
-
-                        <div class="col-md-12">
-                            <label class="text-black" for="email">Email</label>
-                            <input type="email" id="email" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row form-group">
-
-                        <div class="col-md-12">
-                            <label class="text-black" for="subject">Тема</label>
-                            <input type="subject" id="subject" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <label class="text-black" for="message">Сообщение</label>
-                            <textarea name="message" id="message" cols="30" rows="7" class="form-control"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <input type="submit" value="Send Message" class="btn btn-primary py-2 px-4 text-white">
-                        </div>
-                    </div>
-
-
-                </form>*@
-            </div>
-            @*<div class="col-md-5">
-
-                <div class="p-4 mb-3 bg-white">
-                    <p class="mb-0 font-weight-bold">Address</p>
-                    <p class="mb-4">203 Fake St. Mountain View, San Francisco, California, USA</p>
-
-                    <p class="mb-0 font-weight-bold">Phone</p>
-                    <p class="mb-4"><a href="#">+1 232 3235 324</a></p>
-
-                    <p class="mb-0 font-weight-bold">Email Address</p>
-                    <p class="mb-0"><a href="#">youremail@domain.com</a></p>
-
                 </div>
 
-                <div class="p-4 mb-3 bg-white">
-                    <h3 class="h5 text-black mb-3">More Info</h3>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa ad iure porro mollitia architecto hic consequuntur. Distinctio nisi perferendis dolore, ipsa consectetur? Fugiat quaerat eos qui, libero neque sed nulla.</p>
-                    <p><a href="#" class="btn btn-primary px-4 py-2 text-white">Learn More</a></p>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <label class="text-black" for="email">patronymic</label>
+                        <InputText id="patronymic" class="form-control" @bind-Value="client.Patronymic"></InputText>
+                    </div>
                 </div>
 
-            </div>*@
-        
+                <div class="row form-group">
+
+                    <div class="col-md-12">
+                        <label class="text-black" for="email">Email</label>
+                        <InputText id="email" class="form-control" @bind-Value="client.Email"></InputText>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+
+                    <div class="col-md-12">
+                        <label class="text-black" for="phone">Телефон</label>
+                        <InputText id="phone" class="form-control" @bind-Value="client.PhoneNumber"></InputText>
+                    </div>
+                </div>
+                <div class="row form-group">
+
+                    <div class="col-md-12">
+                        <label class="text-black" for="address">Адрес</label>
+                        <InputText id="address" class="form-control" @bind-Value="client.Address"></InputText>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <label class="text-black" for="description">Сообщение</label>
+                        <InputTextArea id="description" cols="30" @bind-Value="order.Description" rows="7" class="form-control"></InputTextArea>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary py-2 px-4 text-white">Отправить</button>
+                    </div>
+                </div>
+
+
+            </EditForm>
+        </div>
     </div>
 </div>
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 
-@code{
+@code {
+    private Task<IJSObjectReference> _module;
+    private Task<IJSObjectReference> Module => _module ??= JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/take_input_value.js").AsTask();
+
+    async Task TestValue()
+    {
+        var module = await Module;
+        string values = await module.InvokeAsync<string>("takeValues");
+        string[] valueParse = values.Split(',').Where(v => v != string.Empty).ToArray();
+        
+    }
+
     Order order = new Order();
     Client client = new Client();
     protected override async Task OnInitializedAsync()
     {
         await ServicesService.LoadService();
         order.DateSubmission = DateTime.Now;
+        CleaningDbContext context = new CleaningDbContext();
+        List<Order> Orders = await context.Orders.Include(o => o.IdStatusNavigation).ToListAsync();
+    }
+    void OrderAddPrice(decimal value)
+    {
+        order.PriceOrder += value;
     }
     async Task HandleSubmit()
     {
@@ -532,7 +421,8 @@
         await OrderService.CreateOrder(order, client);
         order = new Order();
         client = new Client();
-
+       
 
     }
+
 }
